@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # The Web & CLI Application
+  app:
+    build: .
+    container_name: customer_app
+    ports:
+      - "9000:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+      - redis
+    networks:
+      - customer_network
+
+  # MySQL Database (Requirement #2, #4)
+  db:
+    image: mysql:8.0
+    container_name: customer_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: customer_db
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - customer_network
+
+  # Redis Cache (Requirement #10 - High Performance Service)
+  redis:
+    image: redis:alpine
+    container_name: customer_redis
+    networks:
+      - customer_network
+
+networks:
+  customer_network:
+    driver: bridge
+
+volumes:
+  db_data:
